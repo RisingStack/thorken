@@ -1,6 +1,7 @@
 var _ = require('lodash')
 var Redis = require('ioredis')
 var jwt = require('jsonwebtoken')
+var Promise = require('promise')
 
 var PREFIX = {
   NAMESPACE: 'n:',
@@ -18,7 +19,9 @@ var DEFAULT = {
 * @class TokenSession
 * @param {Object} opts {
 *  [namespace]: String,
-*  jwtSecret: String
+*  [redis]: Redis, ioredis instance,
+*  jwtSecret: String,
+*  [cleanupManual]: Boolean, default: false
 * }
 */
 function TokenSession (opts) {
@@ -27,20 +30,23 @@ function TokenSession (opts) {
   opts = opts || {}
   opts = _.defaults(opts, {
     namespace: DEFAULT.NAMESPACE,
-    cleanupInterval: DEFAULT.CLEANUP_INTERVAL
+    cleanupInterval: DEFAULT.CLEANUP_INTERVAL,
+    cleanupManual: false
   })
 
   if (!opts.jwtSecret) {
     throw new Error('jwtSecret is required')
   }
 
-  _this.redis = new Redis()
+  _this.redis = opts.redis || new Redis()
   _this.namespace = opts.namespace
   _this.jwtSecret = opts.jwtSecret
 
-  _this.cleanupIntervalId = setInterval(function () {
-    _this.cleanup()
-  }, opts.cleanupInterval)
+  if (!opts.cleanupManual) {
+    _this.cleanupIntervalId = setInterval(function () {
+      _this.cleanup()
+    }, opts.cleanupInterval)
+  }
 }
 
 /**
@@ -50,6 +56,7 @@ function TokenSession (opts) {
 *   [ttl]: Number in second
 *   ip: String
 * }
+* @return {String} token, jwt
 */
 TokenSession.prototype.create = function (opts) {
   opts = opts || {}
@@ -87,7 +94,7 @@ TokenSession.prototype.create = function (opts) {
     tokenPayload.ip = opts.ip
   }
 
-  this.redis
+  return this.redis
     .multi(tokenListKey, expiresAt)
 
     // add token to the list by score
@@ -99,15 +106,57 @@ TokenSession.prototype.create = function (opts) {
 
     // store token props
     .hmset(tokenKey, tokenPayload)
+    .exec()
+    .then(function () {
+      return token
+    })
 }
 
 /**
+* Remove expired tokens
 * @method cleanup
 */
 TokenSession.prototype.cleanup = function () {
-  // TODO: ZRANGEBYSCORE, get expired ones
-  // TODO: remove expired ones from token list (get token -> split list value by :)
-  // TODO: remove expired ones from user (get userId -> split list value by :)
+  var namespace = PREFIX.NAMESPACE + this.namespace
+  var tokenListKey = namespace + PREFIX.token + 'list'
+  var now = Date.now()
+
+  return this.redis
+
+    // get expired tokens
+    .zrangebyscore(tokenListKey, 0, now)
+      .then(function (expiredItems) {
+        // extract token keys from expired items
+        var tokenKeys = expiredItems.map(function (item) {
+          var tmp = item.split(':')
+          var token = tmp[0]
+          var tokenKey = namespace + PREFIX.TOKEN + token
+
+          return tokenKey
+        })
+
+        // remove from token list and token properties
+        var multi = this.redis.multi()
+          .del(tokenKeys)
+          .zremrangebyscore(tokenListKey, 0, now)
+
+        // remove tokens from users
+        expiredItems.forEach(function (item) {
+          var tmp = item.split(':')
+          var token = tmp[0]
+          var userId = tmp[1]
+          var userKey = PREFIX.USER + userId
+
+          multi = multi.srem(userKey, token)
+        })
+
+        // return with number of removed tokens
+        return multi
+          .exec()
+          .then(function (results) {
+            return results[0]
+          })
+      })
 }
 
 module.exports = TokenSession
