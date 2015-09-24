@@ -52,6 +52,65 @@ describe('e2e', () => {
     })
   })
 
+  describe('#get', () => {
+    var token
+
+    beforeEach(function *() {
+      token = yield session.create({
+        uid: '1',
+        ip: '192.168.1.1'
+      })
+    })
+
+    it('should return with session', function *() {
+      var props = yield session.get(token)
+
+      expect(props).to.have.property('uid', '1')
+      expect(props).to.have.property('ip', '192.168.1.1')
+    })
+
+    it('should reject malformed token', function *() {
+      try {
+        yield session.get('invalid token')
+      } catch (err) {
+        expect(err.message).to.be.equal('jwt malformed')
+        return
+      }
+
+      throw new Error('unhandled error')
+    })
+
+    it('should reject invalid token', function *() {
+      try {
+        yield session.get('a.a.b')
+      } catch (err) {
+        expect(err.message).to.be.equal('invalid token')
+        return
+      }
+
+      throw new Error('unhandled error')
+    })
+
+    it('should reject unknown token', function *() {
+      var token = jwt.sign({
+        uid: '1'
+      }, session.jwtSecret)
+
+      try {
+        yield session.get(token)
+      } catch (err) {
+        expect(err.message).to.be.equal('unknown token')
+        return
+      }
+
+      throw new Error('unhandled error')
+    })
+
+    afterEach(function *() {
+      yield redis.flushall()
+    })
+  })
+
   describe('#cleanup', () => {
     beforeEach(function *() {
       yield session.create({

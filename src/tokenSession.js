@@ -79,7 +79,8 @@ TokenSession.prototype.create = function (opts) {
 
   // create JWT token
   var token = jwt.sign({
-    uid: opts.uid
+    uid: opts.uid,
+    ts: Date.now()
   }, _this.jwtSecret)
 
   var userKey = _this.namespaceKey + PREFIX.USER + opts.uid
@@ -119,6 +120,29 @@ TokenSession.prototype.create = function (opts) {
 
           return token
         })
+    })
+}
+
+/**
+* Get token properties
+* @method get
+*/
+TokenSession.prototype.get = function (token) {
+  var _this = this
+  var tokenKey = _this.namespaceKey + PREFIX.TOKEN + token
+
+  return Promise.all([
+    TokenSession.jwtVerify(token, _this.jwtSecret),
+    _this.redis.hgetall(tokenKey)
+  ])
+    .then(function (results) {
+      var props = results[1]
+
+      if (_.isEqual(props, {})) {
+        throw new Error('unknown token')
+      }
+
+      return results[1]
     })
 }
 
@@ -174,6 +198,26 @@ TokenSession.prototype.cleanup = function (cleanupAll) {
             return results[0]
           })
       })
+}
+
+/**
+* @method jwtVerify
+* @param {String} token
+*/
+TokenSession.jwtVerify = function () {
+  var args = Array.prototype.slice.call(arguments)
+
+  return new Promise(function (resolve, reject) {
+    args.push(function (err, payload) {
+      if (err) {
+        return reject(err)
+      }
+
+      resolve(payload)
+    })
+
+    jwt.verify.apply(jwt, args)
+  })
 }
 
 module.exports = TokenSession

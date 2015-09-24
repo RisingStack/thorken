@@ -29,6 +29,13 @@ session.create({
 .then(function (jwtToken) { ... })
 ```
 
+### Get
+
+```
+session.get('token')
+.then(function (session) { ... })
+```
+
 ### Cleanup
 
 For manual cleanup.
