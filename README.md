@@ -22,7 +22,7 @@ var session = new TokenSession({
 
 ```
 session.create({
-  userId: '1',
+  uid: '1',
   [ttl]: 7200,
   [ip]: '127.0.0.1'
 })

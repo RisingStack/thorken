@@ -53,51 +53,51 @@ function TokenSession (opts) {
 /**
 * @method create
 * @param {Object} opts {
-*   userId: String
+*   uid: String
 *   [ttl]: Number in second
 *   [ip]: String
 * }
 * @return {String} token, jwt
 */
 TokenSession.prototype.create = function (opts) {
+  var _this = this
+
   opts = opts || {}
   opts = _.defaults(opts, {
     ttl: DEFAULT.TTL
   })
 
-  if (!opts.userId) {
-    return Promise.reject(new Error('userId is required'))
+  if (!opts.uid) {
+    return Promise.reject(new Error('uid is required'))
   }
 
   if (!_.isNumber(opts.ttl)) {
     return Promise.reject(new Error('ttl is required and should be a Number'))
   }
 
-  opts.userId = String(opts.userId)
+  opts.uid = String(opts.uid)
 
   // create JWT token
   var token = jwt.sign({
-    userId: opts.userId
-  }, this.jwtSecret, {
-    expiresInSeconds: opts.ttl
-  })
+    uid: opts.uid
+  }, _this.jwtSecret)
 
-  var userKey = this.namespaceKey + PREFIX.USER + opts.userId
-  var tokenListKey = this.namespaceKey + PREFIX.TOKEN + 'list'
-  var tokenListValue = opts.userId + ':' + token
-  var tokenKey = this.namespaceKey + PREFIX.TOKEN + token
+  var userKey = _this.namespaceKey + PREFIX.USER + opts.uid
+  var tokenListKey = _this.namespaceKey + PREFIX.TOKEN + 'list'
+  var tokenListValue = opts.uid + ':' + token
+  var tokenKey = _this.namespaceKey + PREFIX.TOKEN + token
 
   var expiresAt = Date.now() + (opts.ttl * 1000)
   var tokenPayload = {
-    uid: opts.userId,
-    ttl: opts.ttl
+    uid: opts.uid,
+    exp: expiresAt
   }
 
   if (opts.ip) {
     tokenPayload.ip = opts.ip
   }
 
-  return this.redis
+  return _this.redis
     .multi()
 
     // add token to the list by score
@@ -111,7 +111,14 @@ TokenSession.prototype.create = function (opts) {
     .hmset(tokenKey, tokenPayload)
     .exec()
     .then(function () {
-      return token
+      return _this.redis.pexpireat(tokenKey, expiresAt)
+        .then(function (result) {
+          if (result !== 1) {
+            throw new Error('cannot set expiration on token')
+          }
+
+          return token
+        })
     })
 }
 
@@ -144,15 +151,18 @@ TokenSession.prototype.cleanup = function (cleanupAll) {
 
         // remove from token list and token properties
         var multi = _this.redis.multi()
-          .del(tokenKeys)
           .zremrangebyscore(tokenListKey, 0, to)
+
+        if (cleanupAll) {
+          multi = multi.del(tokenKeys)
+        }
 
         // remove tokens from users
         expiredItems.forEach(function (item) {
           var tmp = item.split(':')
-          var userId = tmp[0]
+          var uid = tmp[0]
           var token = tmp[1]
-          var userKey = _this.namespaceKey + PREFIX.USER + userId
+          var userKey = _this.namespaceKey + PREFIX.USER + uid
 
           multi = multi.srem(userKey, token)
         })
