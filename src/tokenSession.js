@@ -53,9 +53,9 @@ function TokenSession (opts) {
 /**
 * @method create
 * @param {Object} opts {
-*   userId: [String|Number}
+*   userId: String
 *   [ttl]: Number in second
-*   ip: String
+*   [ip]: String
 * }
 * @return {String} token, jwt
 */
@@ -72,6 +72,8 @@ TokenSession.prototype.create = function (opts) {
   if (!_.isNumber(opts.ttl)) {
     return Promise.reject(new Error('ttl is required and should be a Number'))
   }
+
+  opts.userId = String(opts.userId)
 
   // create JWT token
   var token = jwt.sign({

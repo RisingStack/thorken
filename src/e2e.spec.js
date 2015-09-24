@@ -22,13 +22,13 @@ describe('e2e', () => {
   describe('#create', () => {
     it('should create a session', function *() {
       var token = yield session.create({
-        userId: 1
+        userId: '1'
       })
 
       var userId = yield jwt.verify(token, 'secret')
       var props = yield redis.hgetall(session.namespaceKey + 't:' + token)
 
-      expect(userId).to.have.property('userId', 1)
+      expect(userId).to.have.property('userId', '1')
 
       expect(props).to.be.eql({
         ttl: '7200',
@@ -46,7 +46,7 @@ describe('e2e', () => {
 
     beforeEach(function *() {
       token1 = yield session.create({
-        userId: 1,
+        userId: '1',
         ttl: -1
       })
     })
@@ -69,7 +69,7 @@ describe('e2e', () => {
 
     it('should remove only expired sessions', function *() {
       var token2 = yield session.create({
-        userId: 2
+        userId: '2'
       })
 
       yield session.cleanup()
