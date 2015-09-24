@@ -147,6 +147,29 @@ TokenSession.prototype.get = function (token) {
 }
 
 /**
+* Destory token
+* @method destroy
+*/
+TokenSession.prototype.destroy = function (token) {
+  var _this = this
+  var tokenKey = _this.namespaceKey + PREFIX.TOKEN + token
+  var tokenPayload = jwt.verify(token, _this.jwtSecret)
+  var tokenListKey = _this.namespaceKey + PREFIX.TOKEN + 'list'
+  var userKey = _this.namespaceKey + PREFIX.USER + tokenPayload.uid
+  var tokenListValue = tokenPayload.uid + ':' + token
+
+  return this.redis
+    .multi()
+    .del(tokenKey)
+    .srem(userKey, token)
+    .srem(tokenListKey, tokenListValue)
+    .exec()
+    .then(function (results) {
+      return results[0][1] === 1
+    })
+}
+
+/**
 * Remove expired tokens
 * @method cleanup
 */

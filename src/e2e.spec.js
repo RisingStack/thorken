@@ -111,6 +111,34 @@ describe('e2e', () => {
     })
   })
 
+  describe('#destroy', () => {
+    var token
+
+    beforeEach(function *() {
+      token = yield session.create({
+        uid: '1'
+      })
+    })
+
+    it('should return with session', function *() {
+      var iSuccess = yield session.destroy(token)
+
+      // expect
+      var userTokens = yield redis.smembers(session.namespaceKey + 'u:1')
+      var tokens = yield redis.smembers(session.namespaceKey + 'u:list')
+      var props = yield redis.hgetall(session.namespaceKey + 't:' + token)
+
+      expect(iSuccess).to.be.true
+      expect(userTokens).to.be.eql([])
+      expect(tokens).to.be.eql([])
+      expect(props).to.be.eql({})
+    })
+
+    afterEach(function *() {
+      yield redis.flushall()
+    })
+  })
+
   describe('#cleanup', () => {
     beforeEach(function *() {
       yield session.create({

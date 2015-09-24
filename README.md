@@ -36,6 +36,13 @@ session.get('token')
 .then(function (session) { ... })
 ```
 
+### Destroy
+
+```
+session.destroy('token')
+.then(function (isSuccess) { ... })
+```
+
 ### Cleanup
 
 For manual cleanup.
