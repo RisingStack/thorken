@@ -5,7 +5,7 @@ var chai = require('chai')
 var sinonChai = require('sinon-chai')
 var debug = require('debug')
 
-debug.enable('token-session:*')
+debug.enable('thorken:*')
 
 before(function () {
   chai.use(sinonChai)

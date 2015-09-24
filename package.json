@@ -1,5 +1,5 @@
 {
-  "name": "token-session",
+  "name": "thorken",
   "version": "1.0.0",
   "description": "Redis and JWT token based session manager.",
   "main": "index.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RisingStack/token-session.git"
+    "url": "git+https://github.com/RisingStack/thorken.git"
   },
   "author": "RisingStack Inc.",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/RisingStack/token-session/issues"
+    "url": "https://github.com/RisingStack/thorken/issues"
   },
-  "homepage": "https://github.com/RisingStack/token-session#readme",
+  "homepage": "https://github.com/RisingStack/thorken#readme",
   "dependencies": {
     "debug": "^2.2.0",
     "ioredis": "^1.9.0",
