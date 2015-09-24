@@ -142,7 +142,36 @@ TokenSession.prototype.get = function (token) {
         throw new Error('unknown token')
       }
 
+      props.exp = Number(props.exp)
+
       return results[1]
+    })
+}
+
+/**
+* Extend token's expiration
+* @method extend
+*/
+TokenSession.prototype.extend = function (token, ttl) {
+  ttl = _.isNumber(ttl) ? ttl : DEFAULT.TTL
+
+  var _this = this
+
+  return _this.get(token)
+    .then(function (props) {
+      var tokenKey = _this.namespaceKey + PREFIX.TOKEN + token
+      var expiresAt = Date.now() + (ttl * 1000)
+
+      props.exp = expiresAt
+
+      return _this.redis
+        .multi()
+        .hmset(tokenKey, props)
+        .pexpireat(tokenKey, expiresAt)
+        .exec()
+        .then(function () {
+          return expiresAt
+        })
     })
 }
 

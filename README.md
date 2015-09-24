@@ -36,6 +36,13 @@ session.get('token')
 .then(function (session) { ... })
 ```
 
+### Extend
+
+```
+session.extend('token', 7200)
+.then(function (expiresAt) { ... })
+```
+
 ### Destroy
 
 ```

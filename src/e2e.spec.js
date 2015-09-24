@@ -52,6 +52,48 @@ describe('e2e', () => {
     })
   })
 
+  describe('#extend', () => {
+    var token
+
+    beforeEach(function *() {
+      token = yield session.create({
+        uid: '1',
+        ttl: 2
+      })
+    })
+
+    it('should extend a session expiration', function *() {
+      var expireAt = Date.now() + 7200000
+
+      yield session.extend(token)
+
+      // expect
+      var tokenKey = session.namespaceKey + 't:' + token
+      var props = yield redis.hgetall(tokenKey)
+      var ttl = yield redis.pttl(tokenKey)
+
+      expect(ttl).to.be.above(7198000)
+      expect(ttl).to.be.below(7200000)
+
+      expect(Number(props.exp)).to.be.at.least(expireAt)
+    })
+
+    it('should handle if token is invalid', function *() {
+      try {
+        yield session.extend('a.a.b')
+      } catch (err) {
+        expect(err.message).to.be.equal('invalid token')
+        return
+      }
+
+      throw new Error('unhandled error')
+    })
+
+    afterEach(function *() {
+      yield redis.flushall()
+    })
+  })
+
   describe('#get', () => {
     var token
 
