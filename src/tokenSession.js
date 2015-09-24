@@ -191,7 +191,7 @@ TokenSession.prototype.destroy = function (token) {
     .multi()
     .del(tokenKey)
     .srem(userKey, token)
-    .srem(tokenListKey, tokenListValue)
+    .zrem(tokenListKey, tokenListValue)
     .exec()
     .then(function (results) {
       return results[0][1] === 1
