@@ -7,7 +7,7 @@
 
 ### Configure
 
-```
+```javascript
 var TokenSession = require('token-session')
 var session = new TokenSession({
   jwtSecret: 'secret',
@@ -20,7 +20,7 @@ var session = new TokenSession({
 
 ### Create
 
-```
+```javascript
 session.create({
   uid: '1',
   [ttl]: 7200,
@@ -31,21 +31,21 @@ session.create({
 
 ### Get
 
-```
+```javascript
 session.get('token')
 .then(function (session) { ... })
 ```
 
 ### Extend
 
-```
+```javascript
 session.extend('token', 7200)
 .then(function (expiresAt) { ... })
 ```
 
 ### Destroy
 
-```
+```javascript
 session.destroy('token')
 .then(function (isSuccess) { ... })
 ```
@@ -55,12 +55,14 @@ session.destroy('token')
 For manual cleanup.
 
 To clear only expired sessions
-```
+
+```javascript
 session.cleanup(true).then(function () { ... })
 ```
 
 To clear every session
-```
+
+```javascript
 session.cleanup(true).then(function () { ... })
 ```
 
