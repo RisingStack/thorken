@@ -63,3 +63,11 @@ To clear every session
 ```
 session.cleanup(true).then(function () { ... })
 ```
+
+### Get user's sessions
+
+// TODO
+
+### Destroy user's sessions
+
+// TODO
