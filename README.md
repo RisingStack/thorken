@@ -5,6 +5,8 @@
 
 ## Usage
 
+You need [redis](http://redis.io) to use this package.  
+
 `npm install --save thorken`
 
 ### Configure

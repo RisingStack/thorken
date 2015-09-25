@@ -13,6 +13,13 @@
   },
   "author": "RisingStack Inc.",
   "license": "ISC",
+  "keywords": [
+    "token",
+    "JWT",
+    "session",
+    "redis",
+    "koa"    
+  ],
   "bugs": {
     "url": "https://github.com/RisingStack/thorken/issues"
   },
