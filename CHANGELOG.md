@@ -1,3 +1,13 @@
+<a name="1.1.0"></a>
+# 1.1.0 (2015-09-25)
+
+
+### feat
+
+* feat(koa): add Koa middleware ([7d3655b](https://github.com/RisingStack/thorken/commit/7d3655b))
+
+
+
 <a name="1.0.0"></a>
 # 1.0.0 (2015-09-24)
 
