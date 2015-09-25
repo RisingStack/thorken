@@ -5,6 +5,8 @@
 
 ## Usage
 
+`npm install --save thorken`
+
 ### Configure
 
 ```javascript
