@@ -76,7 +76,9 @@ session.cleanup(true).then(function () { ... })
 
 ### Destroy user's sessions
 
-// TODO
+```javascript
+session.destroyUser('1').then(function (isSuccess) { ... })
+```
 
 ## Server connectors
 

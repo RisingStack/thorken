@@ -199,6 +199,39 @@ Thorken.prototype.destroy = function (token) {
 }
 
 /**
+* Destory token
+* @method destroyUser
+*/
+Thorken.prototype.destroyUser = function (uid) {
+  var _this = this
+  var userKey = _this.namespaceKey + PREFIX.USER + uid
+  var tokenListKey = _this.namespaceKey + PREFIX.TOKEN + 'list'
+
+  return _this.redis.smembers(userKey)
+    .then(function (tokens) {
+      var keysForDel = tokens.map(function (token) {
+        return _this.namespaceKey + PREFIX.TOKEN + token
+      })
+
+      keysForDel.push(userKey)
+
+      var listMembers = tokens.map(function (token) {
+        return uid + ':' + token
+      })
+
+      return _this.redis.multi()
+        .del(keysForDel)
+        .zrem(tokenListKey, listMembers)
+        .exec()
+        .then(function (results) {
+          return results.every(function (result) {
+            return result[0] === null
+          })
+        })
+    })
+}
+
+/**
 * Remove expired tokens
 * @method cleanup
 */

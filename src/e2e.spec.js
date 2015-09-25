@@ -167,12 +167,51 @@ describe('e2e', () => {
 
       // expect
       var userTokens = yield redis.smembers(thorken.namespaceKey + 'u:1')
-      var tokens = yield redis.smembers(thorken.namespaceKey + 'u:list')
+      var tokens = yield redis.zrangebyscore(thorken.namespaceKey + 't:list', 0, '+inf')
       var props = yield redis.hgetall(thorken.namespaceKey + 't:' + token)
 
       expect(iSuccess).to.be.true
       expect(userTokens).to.be.eql([])
       expect(tokens).to.be.eql([])
+      expect(props).to.be.eql({})
+    })
+
+    afterEach(function *() {
+      yield redis.flushall()
+    })
+  })
+
+  describe('#destroy user', () => {
+    var token1
+    var token3
+
+    beforeEach(function *() {
+      token1 = yield thorken.create({
+        uid: '1'
+      })
+
+      yield thorken.create({
+        uid: '1'
+      })
+
+      token3 = yield thorken.create({
+        uid: '2'
+      })
+    })
+
+    it('should remove user and user\'s tokens', function *() {
+      var iSuccess = yield thorken.destroyUser('1')
+
+      // expect
+      var userTokens = yield redis.smembers(thorken.namespaceKey + 'u:1')
+      var tokens = yield redis.zrangebyscore(thorken.namespaceKey + 't:list', 0, '+inf')
+      var props = yield redis.hgetall(thorken.namespaceKey + 't:' + token1)
+
+      expect(iSuccess).to.be.true
+      expect(userTokens).to.be.eql([])
+      expect(tokens).to.be.eql([
+        '2:' + token3
+      ])
       expect(props).to.be.eql({})
     })
 
