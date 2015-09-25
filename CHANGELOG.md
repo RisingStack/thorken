@@ -1,3 +1,19 @@
+<a name="1.1.1"></a>
+## 1.1.1 (2015-09-25)
+
+
+### docs
+
+* docs(readme): add install snippet ([a8b7838](https://github.com/RisingStack/thorken/commit/a8b7838))
+* docs(readme): add redis requirements ([3129a64](https://github.com/RisingStack/thorken/commit/3129a64))
+* docs(readme): fix cleanup interface ([91ebd14](https://github.com/RisingStack/thorken/commit/91ebd14))
+
+### test
+
+* test(koa): cover Koa middleware with unit and e2e tests ([75426bb](https://github.com/RisingStack/thorken/commit/75426bb))
+
+
+
 <a name="1.1.0"></a>
 # 1.1.0 (2015-09-25)
 
