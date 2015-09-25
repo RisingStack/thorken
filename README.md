@@ -59,7 +59,7 @@ For manual cleanup.
 To clear only expired sessions
 
 ```javascript
-session.cleanup(true).then(function () { ... })
+session.cleanup().then(function () { ... })
 ```
 
 To clear every session
