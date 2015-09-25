@@ -1,5 +1,5 @@
 var _ = require('lodash')
-var Thorken = require('./thorken')
+var Thorken = require('../thorken')
 
 /**
 * @method factory
@@ -10,7 +10,7 @@ var Thorken = require('./thorken')
 * @return {Generator} middleware
 */
 function factory (thorken, opts) {
-  var options = _.extends(opts || {}, {
+  var options = _.defaults(opts || {}, {
     extend: true
   })
 
