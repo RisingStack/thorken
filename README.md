@@ -8,8 +8,8 @@
 ### Configure
 
 ```javascript
-var TokenSession = require('thorken')
-var session = new TokenSession({
+var Thorken = require('thorken')
+var session = new Thorken({
   jwtSecret: 'secret',
   [namespace]: 'ts',
   [redis]: ioredisInstance,
@@ -73,3 +73,18 @@ session.cleanup(true).then(function () { ... })
 ### Destroy user's sessions
 
 // TODO
+
+## Server connectors
+
+### Koa middleware
+
+```javascript
+var app = require('koa')()
+var Thorken = require('thorken')
+var protect = require('thorken/src/koa')
+var session = new Thorken({ ... })
+
+app.use(protect(session, {
+  [extend]: true
+}))
+```

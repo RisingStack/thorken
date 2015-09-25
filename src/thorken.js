@@ -16,7 +16,7 @@ var DEFAULT = {
 }
 
 /**
-* @class TokenSession
+* @class Thorken
 * @param {Object} opts {
 *  [namespace]: String,
 *  [redis]: Redis, ioredis instance,
@@ -24,7 +24,7 @@ var DEFAULT = {
 *  [cleanupManual]: Boolean, default: false
 * }
 */
-function TokenSession (opts) {
+function Thorken (opts) {
   var _this = this
 
   opts = opts || {}
@@ -59,7 +59,7 @@ function TokenSession (opts) {
 * }
 * @return {String} token, jwt
 */
-TokenSession.prototype.create = function (opts) {
+Thorken.prototype.create = function (opts) {
   var _this = this
 
   opts = opts || {}
@@ -127,12 +127,12 @@ TokenSession.prototype.create = function (opts) {
 * Get token properties
 * @method get
 */
-TokenSession.prototype.get = function (token) {
+Thorken.prototype.get = function (token) {
   var _this = this
   var tokenKey = _this.namespaceKey + PREFIX.TOKEN + token
 
   return Promise.all([
-    TokenSession.jwtVerify(token, _this.jwtSecret),
+    Thorken.jwtVerify(token, _this.jwtSecret),
     _this.redis.hgetall(tokenKey)
   ])
     .then(function (results) {
@@ -152,7 +152,7 @@ TokenSession.prototype.get = function (token) {
 * Extend token's expiration
 * @method extend
 */
-TokenSession.prototype.extend = function (token, ttl) {
+Thorken.prototype.extend = function (token, ttl) {
   ttl = _.isNumber(ttl) ? ttl : DEFAULT.TTL
 
   var _this = this
@@ -179,7 +179,7 @@ TokenSession.prototype.extend = function (token, ttl) {
 * Destory token
 * @method destroy
 */
-TokenSession.prototype.destroy = function (token) {
+Thorken.prototype.destroy = function (token) {
   var _this = this
   var tokenKey = _this.namespaceKey + PREFIX.TOKEN + token
   var tokenPayload = jwt.verify(token, _this.jwtSecret)
@@ -202,7 +202,7 @@ TokenSession.prototype.destroy = function (token) {
 * Remove expired tokens
 * @method cleanup
 */
-TokenSession.prototype.cleanup = function (cleanupAll) {
+Thorken.prototype.cleanup = function (cleanupAll) {
   var _this = this
   var tokenListKey = _this.namespaceKey + PREFIX.TOKEN + 'list'
   var to = Date.now()
@@ -256,7 +256,7 @@ TokenSession.prototype.cleanup = function (cleanupAll) {
 * @method jwtVerify
 * @param {String} token
 */
-TokenSession.jwtVerify = function () {
+Thorken.jwtVerify = function () {
   var args = Array.prototype.slice.call(arguments)
 
   return new Promise(function (resolve, reject) {
@@ -272,4 +272,4 @@ TokenSession.jwtVerify = function () {
   })
 }
 
-module.exports = TokenSession
+module.exports = Thorken

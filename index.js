@@ -1,1 +1,1 @@
-module.exports = require('./src/tokenSession')
+module.exports = require('./src/thorken')
