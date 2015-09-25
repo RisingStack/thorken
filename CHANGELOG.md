@@ -1,3 +1,13 @@
+<a name="1.2.0"></a>
+# 1.2.0 (2015-09-25)
+
+
+### feat
+
+* feat(destroy): add destroy user ([d426c66](https://github.com/RisingStack/thorken/commit/d426c66))
+
+
+
 <a name="1.1.1"></a>
 ## 1.1.1 (2015-09-25)
 
