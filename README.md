@@ -42,6 +42,8 @@ session.get('token')
 
 ### Extend
 
+The second ttl parameter is optional.
+
 ```javascript
 session.extend('token', 7200)
 .then(function (expiresAt) { ... })
