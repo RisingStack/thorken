@@ -215,13 +215,23 @@ Thorken.prototype.destroyUser = function (uid) {
 
       keysForDel.push(userKey)
 
-      var listMembers = tokens.map(function (token) {
+      var userTokens = tokens.map(function (token) {
         return uid + ':' + token
       })
 
-      return _this.redis.multi()
-        .del(keysForDel)
-        .zrem(tokenListKey, listMembers)
+      var multi = _this.redis.multi()
+
+      // remove tokens
+      if (keysForDel.length) {
+        multi = multi.del(keysForDel)
+      }
+
+      // remove user's tokens from token list
+      if (userTokens.length) {
+        multi = multi.zrem(tokenListKey, userTokens)
+      }
+
+      return multi
         .exec()
         .then(function (results) {
           return results.every(function (result) {
