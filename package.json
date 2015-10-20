@@ -1,6 +1,6 @@
 {
   "name": "thorken",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Redis and JWT token based session manager.",
   "main": "index.js",
   "scripts": {

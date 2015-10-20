@@ -1,3 +1,17 @@
+<a name="1.2.1"></a>
+## 1.2.1 (2015-10-20)
+
+
+### chore
+
+* chore(package): update dependencies ([1b2d5aa](https://github.com/RisingStack/thorken/commit/1b2d5aa))
+
+### fix
+
+* fix(destroyUser): remove only existing data ([c0d460f](https://github.com/RisingStack/thorken/commit/c0d460f))
+
+
+
 <a name="1.2.0"></a>
 # 1.2.0 (2015-09-25)
 
