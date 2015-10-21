@@ -1,3 +1,17 @@
+<a name="1.3.0"></a>
+# 1.3.0 (2015-10-21)
+
+
+### docs
+
+* docs(reamde): fix extend docs ([585eee5](https://github.com/RisingStack/thorken/commit/585eee5))
+
+### feat
+
+* feat(getByUserId): implement ([85f1274](https://github.com/RisingStack/thorken/commit/85f1274))
+
+
+
 <a name="1.2.1"></a>
 ## 1.2.1 (2015-10-20)
 
