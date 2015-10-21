@@ -104,6 +104,10 @@ describe('e2e', () => {
       })
     })
 
+    afterEach(function *() {
+      yield thorken.destroy(token)
+    })
+
     it('should return with session', function *() {
       var props = yield thorken.get(token)
 
@@ -150,6 +154,45 @@ describe('e2e', () => {
 
     afterEach(function *() {
       yield redis.flushall()
+    })
+  })
+
+  describe('#getByUserId', () => {
+    var token1
+    var token2
+
+    beforeEach(function *() {
+      var result = yield {
+        token1: thorken.create({
+          uid: '1',
+          ip: '192.168.1.1'
+        }),
+
+        token2: thorken.create({
+          uid: '1',
+          ip: '192.168.1.2'
+        })
+      }
+
+      token1 = result.token1
+      token2 = result.token2
+    })
+
+    afterEach(function *() {
+      yield [thorken.destroy(token1), thorken.destroy(token2)]
+    })
+
+    it('should return with user\'s sessions', function *() {
+      var sessions1 = yield thorken.getByUserId('1')
+      var sessions2 = yield thorken.getByUserId('2')
+
+      expect(sessions1.length).to.be.equal(2)
+      expect(sessions1[0]).property('uid', '1')
+      expect(sessions1[0]).property('ip')
+      expect(sessions1[1]).property('uid', '1')
+      expect(sessions1[1]).property('ip')
+
+      expect(sessions2.length).to.be.equal(0)
     })
   })
 

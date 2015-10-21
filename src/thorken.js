@@ -149,6 +149,25 @@ Thorken.prototype.get = function (token) {
 }
 
 /**
+* Get sessions by user id
+* @method getByUserId
+*/
+Thorken.prototype.getByUserId = function (userId) {
+  var _this = this
+  var userKey = _this.namespaceKey + PREFIX.USER + userId
+
+  return _this.redis.smembers(userKey)
+    .then(function (tokens) {
+      var hgetTokens = tokens.map(function (token) {
+        var tokenKey = _this.namespaceKey + PREFIX.TOKEN + token
+        return _this.redis.hgetall(tokenKey)
+      })
+
+      return Promise.all(hgetTokens)
+    })
+}
+
+/**
 * Extend token's expiration
 * @method extend
 */

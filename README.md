@@ -74,7 +74,9 @@ session.cleanup(true).then(function () { ... })
 
 ### Get user's sessions
 
-// TODO
+```javascript
+session.getByUserId('1').then(function (sessions) { ... })
+```
 
 ### Destroy user's sessions
 
